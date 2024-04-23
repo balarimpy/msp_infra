@@ -1,69 +1,88 @@
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#61676C', 'edgeLabelBackground':'#e8e8e8', 'tertiaryColor': '#61676C' }}}%%
-graph TD
-    subgraph "Cloud Environment"
-        apiGateway["API Gateway<br>Manages API requests<br>Provides security and routing"]
-        loadBalancer["Load Balancer<br>Distributes traffic<br>Provides high availability"]
-        subgraph "Cloud Infrastructure"
-            merchantWebInstance1["Merchant Web Instance 1<br>JavaScript, Angular<br>Runs the merchant web application"]
-            merchantWebInstance2["Merchant Web Instance 2<br>JavaScript, Angular<br>Runs the merchant web application"]
-            merchantDbPrimary["Primary Merchant DB<br>MongoDB<br>Primary database for merchant data"]
-            merchantDbSecondary["Secondary Merchant DB<br>MongoDB<br>Secondary database for merchant data"]
-            onRampingWebInstance1["On-Ramping Web Instance 1<br>JavaScript, Angular<br>Runs the on-ramping web application"]
-            onRampingWebInstance2["On-Ramping Web Instance 2<br>JavaScript, Angular<br>Runs the on-ramping web application"]
-            onRampingDbPrimary["Primary On-Ramping DB<br>MongoDB<br>Primary database for on-ramping data"]
-            onRampingDbSecondary["Secondary On-Ramping DB<br>MongoDB<br>Secondary database for on-ramping data"]
-            virtualWalletCluster["Virtual Wallet Service<br>Java, Spring<br>Manages virtual wallet operations"]
-            virtualWalletDb["Virtual Wallet DB<br>Graph DB<br>Stores virtual wallet data"]
-            transactionCluster["Transaction Service<br>Java, Spring<br>Handles transaction processing"]
-            transactionDb["Transaction DB<br>PostgreSQL<br>Stores transaction data"]
-        end
-    end
-    subgraph "On-Premises Environment"
-        firewall["Firewall<br>Secures on-premises network<br>Allows controlled access"]
-    end
-    merchantPortal["Merchant Portal<br>External web portal for merchants"]
-    onRampingPortal["On-Ramping Portal<br>External web portal for on-ramping"]
-    api["API<br>External API for integration"]
-    sca["SCA<br>External Strong Customer Authentication service"]
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
-    merchantPortal --> firewall
-    onRampingPortal --> firewall
-    api --> firewall
-    sca --> firewall
-    firewall --> apiGateway
-    apiGateway --> loadBalancer
-    loadBalancer --> merchantWebInstance1
-    loadBalancer --> merchantWebInstance2
-    merchantWebInstance1 --> merchantDbPrimary
-    merchantWebInstance2 --> merchantDbSecondary
-    merchantDbPrimary -.-> merchantDbSecondary
-    loadBalancer --> onRampingWebInstance1
-    loadBalancer --> onRampingWebInstance2
-    onRampingWebInstance1 --> onRampingDbPrimary
-    onRampingWebInstance2 --> onRampingDbSecondary
-    onRampingDbPrimary -.-> onRampingDbSecondary
-    merchantWebInstance1 --> virtualWalletCluster
-    merchantWebInstance2 --> virtualWalletCluster
-    onRampingWebInstance1 --> virtualWalletCluster
-    onRampingWebInstance2 --> virtualWalletCluster
-    virtualWalletCluster --> virtualWalletDb
-    merchantWebInstance1 --> transactionCluster
-    merchantWebInstance2 --> transactionCluster
-    onRampingWebInstance1 --> transactionCluster
-    onRampingWebInstance2 --> transactionCluster
-    transactionCluster --> transactionDb
+LAYOUT_TOP_DOWN()
 
-    note right of "Cloud Environment"
-        **Cloud Environment**
-        - API Gateway manages API requests and provides security and routing
-        - Load Balancer distributes traffic across multiple web instances for high availability
-        - Merchant Web Application instances with primary and secondary databases
-        - On-Ramping Web Application instances with primary and secondary databases
-        - Virtual Wallet Service and Graph DB for managing virtual wallet operations
-        - Transaction Service and PostgreSQL DB for handling transaction processing
-    end note
+System_Ext(merchantPortal, "Merchant Portal", "External web portal for merchants")
+System_Ext(onRampingPortal, "On-Ramping Portal", "External web portal for on-ramping")
+System_Ext(api, "API", "External API for integration")
+System_Ext(sca, "SCA", "External Strong Customer Authentication service")
 
-    note right of "On-Premises Environment"
-        **On-Premises Environment**
-        - Firewall secures the on-premises network and allows controlled access to cloud services
-    end note
+System_Boundary(c1, "Cloud Environment") {
+    Container(apiGateway, "API Gateway", "Manages API requests", "Provides security and routing")
+    
+    Container(loadBalancer, "Load Balancer", "Distributes traffic", "Provides high availability")
+    
+    Container(cloudInfrastructure, "Cloud Infrastructure", "Hosts application components") {
+        Container(merchantWebInstance1, "Merchant Web Instance 1", "JavaScript, Angular", "Runs the merchant web application")
+        Container(merchantWebInstance2, "Merchant Web Instance 2", "JavaScript, Angular", "Runs the merchant web application")
+        ContainerDb(merchantDbPrimary, "Primary Merchant DB", "MongoDB", "Primary database for merchant data")
+        ContainerDb(merchantDbSecondary, "Secondary Merchant DB", "MongoDB", "Secondary database for merchant data")
+        
+        Container(onRampingWebInstance1, "On-Ramping Web Instance 1", "JavaScript, Angular", "Runs the on-ramping web application")
+        Container(onRampingWebInstance2, "On-Ramping Web Instance 2", "JavaScript, Angular", "Runs the on-ramping web application")
+        ContainerDb(onRampingDbPrimary, "Primary On-Ramping DB", "MongoDB", "Primary database for on-ramping data")
+        ContainerDb(onRampingDbSecondary, "Secondary On-Ramping DB", "MongoDB", "Secondary database for on-ramping data")
+        
+        Container(virtualWalletCluster, "Virtual Wallet Service", "Java, Spring", "Manages virtual wallet operations")
+        ContainerDb(virtualWalletDb, "Virtual Wallet DB", "Graph DB", "Stores virtual wallet data")
+        
+        Container(transactionCluster, "Transaction Service", "Java, Spring", "Handles transaction processing")
+        ContainerDb(transactionDb, "Transaction DB", "PostgreSQL", "Stores transaction data")
+    }
+}
+
+System_Boundary(c2, "On-Premises Environment") {
+    Container(firewall, "Firewall", "Secures on-premises network", "Allows controlled access")
+}
+
+Rel(merchantPortal, firewall, "Accesses", "HTTPS")
+Rel(onRampingPortal, firewall, "Accesses", "HTTPS")
+Rel(api, firewall, "Calls", "HTTPS")
+Rel(sca, firewall, "Integrates with", "HTTPS")
+
+Rel(firewall, apiGateway, "Forwards requests", "Secured Connection")
+Rel(apiGateway, loadBalancer, "Routes requests", "HTTP")
+
+Rel(loadBalancer, merchantWebInstance1, "Forwards requests", "HTTP")
+Rel(loadBalancer, merchantWebInstance2, "Forwards requests", "HTTP")
+Rel(merchantWebInstance1, merchantDbPrimary, "Reads/Writes to", "MongoDB")
+Rel(merchantWebInstance2, merchantDbSecondary, "Reads/Writes to", "MongoDB")
+Rel(merchantDbPrimary, merchantDbSecondary, "Replicates data", "MongoDB Replication")
+
+Rel(loadBalancer, onRampingWebInstance1, "Forwards requests", "HTTP")
+Rel(loadBalancer, onRampingWebInstance2, "Forwards requests", "HTTP")
+Rel(onRampingWebInstance1, onRampingDbPrimary, "Reads/Writes to", "MongoDB")
+Rel(onRampingWebInstance2, onRampingDbSecondary, "Reads/Writes to", "MongoDB")
+Rel(onRampingDbPrimary, onRampingDbSecondary, "Replicates data", "MongoDB Replication")
+
+Rel(merchantWebInstance1, virtualWalletCluster, "Calls", "JSON/HTTPS")
+Rel(merchantWebInstance2, virtualWalletCluster, "Calls", "JSON/HTTPS")
+Rel(onRampingWebInstance1, virtualWalletCluster, "Calls", "JSON/HTTPS")
+Rel(onRampingWebInstance2, virtualWalletCluster, "Calls", "JSON/HTTPS")
+Rel(virtualWalletCluster, virtualWalletDb, "Reads/Writes to", "Graph DB")
+
+Rel(merchantWebInstance1, transactionCluster, "Calls", "JSON/HTTPS")
+Rel(merchantWebInstance2, transactionCluster, "Calls", "JSON/HTTPS")
+Rel(onRampingWebInstance1, transactionCluster, "Calls", "JSON/HTTPS")
+Rel(onRampingWebInstance2, transactionCluster, "Calls", "JSON/HTTPS")
+Rel(transactionCluster, transactionDb, "Reads/Writes to", "PostgreSQL")
+
+SHOW_LEGEND()
+
+note right of c1
+    **Cloud Environment**
+    - API Gateway manages API requests and provides security and routing
+    - Load Balancer distributes traffic across multiple web instances for high availability
+    - Merchant Web Application instances with primary and secondary databases
+    - On-Ramping Web Application instances with primary and secondary databases
+    - Virtual Wallet Service and Graph DB for managing virtual wallet operations
+    - Transaction Service and PostgreSQL DB for handling transaction processing
+end note
+
+note right of c2
+    **On-Premises Environment**
+    - Firewall secures the on-premises network and allows controlled access to cloud services
+end note
+
+@enduml
