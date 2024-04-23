@@ -1,32 +1,58 @@
-flowchart TD
+@startuml
 
-subgraph "External Connectivity"
-    MSP["Merchant Portal"] --> Firewall
-    ORP["On Ramping Portal"] --> Firewall
-    API["API"] --> Firewall
-    SCA["SCA"] --> Firewall
-end
+skinparam componentStyle uml2
 
-subgraph "Firewall Configuration"
-    Firewall --> APIGateway["API Gateway"]
-end
+package "External Connectivity" {
+    [Merchant Portal] as MSP
+    [On Ramping Portal] as ORP
+    [API] as API
+    [SCA] as SCA
+}
 
-subgraph "API Gateway"
-    APIGateway --> LB["Load Balancer"]
-end
+package "Firewall Configuration" {
+    [Firewall] as Firewall
+}
 
-subgraph "Load Balancers"
-    LB --> MerchantWeb["Merchant Service Web"]
-    LB --> OnrampingWeb["On-ramping Service Web"]
-end
+package "API Gateway" {
+    [API Gateway] as APIGateway
+}
 
-subgraph "Service Clustering"
-    MerchantWeb --> MerchantDB["Merchant DB (mongoDB)"]
-    MerchantCluster["Merchant Service"] --> MerchantDB
-    OnrampingWeb --> OnrampingDB["Onramping DB (mongoDB)"]
-    OnrampingCluster["On-ramping Service"] --> OnrampingDB
-    VirtualWalletCluster["Virtual Wallet Service"] --> VirtualWalletDB["Virtual Wallet DB (graphDB)"]
-    TransactionCluster["Transaction Service"] --> TransactionDB["Transaction DB (Postgresql)"]
-    MerchantCluster --> VirtualWalletCluster
-end
+package "Load Balancers" {
+    [Load Balancer] as LB 
+}
 
+
+
+package "Service Clustering" {
+    [Merchant Service Web] as MerchantWeb
+    [Merchant Service ] as MerchantCluster
+    [Merchant DB (mongoDB)] as MerchantDB
+    [On-ramping Service Web] as OnrampingWeb
+    [On-ramping Service ] as OnrampingCluster
+    [Onramping DB (mongoDB)] as OnrampingDB
+    [Virtual Wallet Service ] as VirtualWalletCluster
+    [Virtual Wallet DB (graphDB)] as VirtualWalletDB 
+    [Transaction Service ] as TransactionCluster
+    [Transaction DB (Postgresql)] as TransactionDB
+}
+
+MSP -down-> Firewall
+SCA -down-> Firewall
+ORP -down-> Firewall
+API -down-> Firewall
+
+Firewall -down-> APIGateway
+APIGateway -down-> LB 
+
+LB -down-> MerchantWeb
+LB -down-> OnrampingWeb
+
+MerchantWeb -down-> MerchantDB
+MerchantCluster -down-> MerchantDB
+OnrampingWeb -down-> OnrampingDB
+OnrampingCluster -down-> OnrampingDB
+VirtualWalletCluster -down-> VirtualWalletDB
+TransactionCluster -down-> TransactionDB
+MerchantCluster -down-> VirtualWalletCluster
+
+@enduml
