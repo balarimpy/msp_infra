@@ -1,38 +1,27 @@
-name: Auto Release
+name: Create Release
 
 on:
   push:
     branches:
       - main
+    tags: []
 
 jobs:
-  auto-release:
-    name: Auto Release
+  create-release:
+    name: Create Release
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Increment Version
-        id: increment_version
-        run: |
-          new_tag=$(echo "v1.0.0") # Placeholder, replace with actual logic
-          echo "::set-output name=new_tag::$new_tag"
-      
-      - name: Create New Tag
-        run: |
-          new_tag=$(echo "${{ steps.increment_version.outputs.new_tag }}")
-          git tag $new_tag
-          git push origin $new_tag
-      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }} # Use the personal access token
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ steps.increment_version.outputs.new_tag }}
-          release_name: ${{ steps.increment_version.outputs.new_tag }}
+          tag_name: ${{ github.sha }} # Use commit SHA as tag name for main branch commits
+          release_name: Release ${{ github.sha }} # Use commit SHA as release name
           draft: false
           prerelease: false
