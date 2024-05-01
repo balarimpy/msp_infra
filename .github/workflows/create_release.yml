@@ -1,59 +1,26 @@
-name: Create Release
+name: Release
 
 on:
   push:
     branches:
       - main
-    tags: []
 
 jobs:
-  create-release:
-    name: Create Release
+  release:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
-      - name: Get Latest Commit
-        id: latest_commit
-        run: |
-          git fetch --depth=1 origin main
-          latest_commit=$(git rev-parse HEAD)
-          echo "::set-output name=latest_commit::$latest_commit"
 
-      - name: Extract Version
-        id: extract_version
-        run: |
-          latest_commit="${{ steps.latest_commit.outputs.latest_commit }}"
-          version=$(git log --format=%B -n 1 $latest_commit | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
-          if [ -z "$version" ]; then
-            echo "No version found in commit message."
-            exit 1
-          fi
-          echo "$version" > VERSION
-          echo "::set-output name=version::$version"
-
-      - name: Increment Version
-        id: increment_version
-        run: |
-          version=$(cat VERSION)
-          IFS='.' read -ra parts <<< "$version"
-          major="${parts[0]}"
-          minor="${parts[1]}"
-          patch="${parts[2]}"
-          ((patch++))
-          new_version="$major.$minor.$patch"
-          echo "$new_version" > VERSION
-          echo "::set-output name=new_version::$new_version"
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          tag_name: ${{ steps.increment_version.outputs.new_version }}
-          release_name: Release ${{ steps.increment_version.outputs.new_version }}
-          draft: false
-          prerelease: false
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run release
