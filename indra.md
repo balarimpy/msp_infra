@@ -1,6 +1,6 @@
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#61676C', 'edgeLabelBackground':'#e8e8e8', 'tertiaryColor': '#61676C' }}}%%
 graph TD
-    subgraph "Cloud Environment Code 5"
+    subgraph "Cloud Environment Code 3"
         apiGateway["API Gateway<br>Manages API requests<br>Provides security and routing"]
         loadBalancer["Load Balancer<br>Distributes traffic<br>Provides high availability"]
         subgraph "Cloud Infrastructure"
