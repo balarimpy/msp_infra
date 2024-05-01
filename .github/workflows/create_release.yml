@@ -19,8 +19,8 @@ jobs:
         id: latest_tag
         run: |
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          tag=$(git describe --abbrev=0 --tags)
-          if [ -z "$tag" ]; then
+          tag=$(git describe --abbrev=0 --tags --always)
+          if [ "$tag" == "fatal: No names found, cannot describe anything." ]; then
             echo "No tags found."
             exit 1
           fi
