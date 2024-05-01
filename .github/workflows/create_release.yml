@@ -15,13 +15,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
+      - name: Get Version
+        id: version
+        run: echo "::set-output name=version::$(cat VERSION)" # Assumes version is stored in a file named VERSION
+      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ github.sha }} # Use commit SHA as tag name for main branch commits
-          release_name: Release ${{ github.sha }} # Use commit SHA as release name
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: Release ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
