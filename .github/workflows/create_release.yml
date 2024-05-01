@@ -15,17 +15,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Get Version
-        id: version
-        run: echo "::set-output name=version::$(cat VERSION)" # Assumes version is stored in a file named VERSION
-      
+      - name: Get Latest Tag
+        id: latest_tag
+        run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
+
+      - name: Extract Version
+        id: extract_version
+        run: |
+          echo "${{ steps.latest_tag.outputs.tag }}" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' > VERSION
+          echo "::set-output name=version::$(cat VERSION)"
+
+      - name: Increment Version
+        id: increment_version
+        run: |
+          version=$(cat VERSION)
+          IFS='.' read -ra parts <<< "$version"
+          major="${parts[0]}"
+          minor="${parts[1]}"
+          patch="${parts[2]}"
+          ((patch++))
+          new_version="$major.$minor.$patch"
+          echo "$new_version" > VERSION
+          echo "::set-output name=new_version::$new_version"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          release_name: Release ${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.increment_version.outputs.new_version }}
+          release_name: Release ${{ steps.increment_version.outputs.new_version }}
           draft: false
           prerelease: false
