@@ -2,8 +2,9 @@ name: Create Release
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
+    tags: []
 
 jobs:
   create-release:
@@ -20,7 +21,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.sha }} # Use commit SHA as tag name for main branch commits
+          release_name: Release ${{ github.sha }} # Use commit SHA as release name
           draft: false
           prerelease: false
