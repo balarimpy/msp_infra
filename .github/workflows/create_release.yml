@@ -19,13 +19,20 @@ jobs:
         id: latest_tag
         run: |
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
+          tag=$(git describe --abbrev=0 --tags)
+          if [ -z "$tag" ]; then
+            echo "No tags found."
+            exit 1
+          fi
+          echo "::set-output name=tag::$tag"
 
       - name: Extract Version
         id: extract_version
         run: |
-          echo "${{ steps.latest_tag.outputs.tag }}" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' > VERSION
-          echo "::set-output name=version::$(cat VERSION)"
+          tag="${{ steps.latest_tag.outputs.tag }}"
+          version=$(echo "$tag" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+          echo "$version" > VERSION
+          echo "::set-output name=version::$version"
 
       - name: Increment Version
         id: increment_version
