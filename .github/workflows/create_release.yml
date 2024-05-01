@@ -10,7 +10,7 @@ jobs:
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
-    node-version: 20
+    node-version: 14
     
     steps:
       - name: Checkout code
