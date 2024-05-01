@@ -1,19 +1,35 @@
-name: Create Release
+name: Auto Release
 
 on:
   push:
     branches:
       - main
-    tags: []
 
 jobs:
-  create-release:
-    name: Create Release
+  auto-release:
+    name: Auto Release
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      
+      - name: Increment Version
+        id: increment_version
+        run: |
+          # Write a script to increment the version
+          # This is just a placeholder, you should replace it with your logic
+          # Example:
+          # current_tag=$(git describe --tags --abbrev=0)
+          # new_tag=$(echo $current_tag | awk -F. '{print $1 "." $2 "." $3+1}')
+          # echo "::set-output name=new_tag::$new_tag"
+          echo "::set-output name=new_tag::v1.0.0" # Placeholder, replace with actual logic
+      
+      - name: Create New Tag
+        run: |
+          new_tag=$(echo "${{ steps.increment_version.outputs.new_tag }}")
+          git tag $new_tag
+          git push origin $new_tag
       
       - name: Create Release
         id: create_release
@@ -21,7 +37,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ github.sha }} # Use commit SHA as tag name for main branch commits
-          release_name: Release ${{ github.sha }} # Use commit SHA as release name
+          tag_name: ${{ steps.increment_version.outputs.new_tag }}
+          release_name: ${{ steps.increment_version.outputs.new_tag }}
           draft: false
           prerelease: false
