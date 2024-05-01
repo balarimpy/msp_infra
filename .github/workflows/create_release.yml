@@ -15,22 +15,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Get Latest Tag
-        id: latest_tag
+      - name: Get Latest Commit
+        id: latest_commit
         run: |
-          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          tag=$(git describe --abbrev=0 --tags --always)
-          if [ "$tag" == "fatal: No names found, cannot describe anything." ]; then
-            echo "No tags found."
-            exit 1
-          fi
-          echo "::set-output name=tag::$tag"
+          git fetch --depth=1 origin main
+          latest_commit=$(git rev-parse HEAD)
+          echo "::set-output name=latest_commit::$latest_commit"
 
       - name: Extract Version
         id: extract_version
         run: |
-          tag="${{ steps.latest_tag.outputs.tag }}"
-          version=$(echo "$tag" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+          latest_commit="${{ steps.latest_commit.outputs.latest_commit }}"
+          version=$(git log --format=%B -n 1 $latest_commit | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
+          if [ -z "$version" ]; then
+            echo "No version found in commit message."
+            exit 1
+          fi
           echo "$version" > VERSION
           echo "::set-output name=version::$version"
 
