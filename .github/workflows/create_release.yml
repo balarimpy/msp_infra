@@ -17,13 +17,8 @@ jobs:
       - name: Increment Version
         id: increment_version
         run: |
-          # Write a script to increment the version
-          # This is just a placeholder, you should replace it with your logic
-          # Example:
-          # current_tag=$(git describe --tags --abbrev=0)
-          # new_tag=$(echo $current_tag | awk -F. '{print $1 "." $2 "." $3+1}')
-          # echo "::set-output name=new_tag::$new_tag"
-          echo "::set-output name=new_tag::v1.0.0" # Placeholder, replace with actual logic
+          new_tag=$(echo "v1.0.0") # Placeholder, replace with actual logic
+          echo "::set-output name=new_tag::$new_tag"
       
       - name: Create New Tag
         run: |
@@ -35,7 +30,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }} # Use the personal access token
         with:
           tag_name: ${{ steps.increment_version.outputs.new_tag }}
           release_name: ${{ steps.increment_version.outputs.new_tag }}
