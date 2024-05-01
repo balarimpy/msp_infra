@@ -2,9 +2,8 @@ name: Create Release
 
 on:
   push:
-    branches:
-      - main
-    tags: []
+    tags:
+      - '*'
 
 jobs:
   create-release:
@@ -15,13 +14,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
+      - name: Retrieve last release version
+        id: get_last_release
+        run: echo "::set-output name=version::$(git describe --abbrev=0 --tags)"
+      
+      - name: Increment version number
+        id: increment_version
+        run: |
+          last_version="${{ steps.get_last_release.outputs.version }}"
+          # Increment the version number (e.g., using a script or tool)
+          new_version="1.0.0"  # Replace with the incremented version number
+          echo "::set-output name=version::$new_version"
+      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.sha }} # Use commit SHA as tag name for main branch commits
-          release_name: Release ${{ github.sha }} # Use commit SHA as release name
+          tag_name: ${{ steps.increment_version.outputs.version }}
+          release_name: Release ${{ steps.increment_version.outputs.version }}
           draft: false
           prerelease: false
