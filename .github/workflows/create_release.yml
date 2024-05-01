@@ -9,12 +9,12 @@ on:
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
   MAIN_BRANCHES: ("main")
-  GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .SemVer
-  GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
-  GITVERSION_TAG_PROPERTY_DEVELOP: .MajorMinorPatch,.PreReleaseLabelWithDash
-  GITVERSION_TAG_PROPERTY_RELEASE: .MajorMinorPatch,.PreReleaseLabelWithDash
-  GITVERSION_TAG_PROPERTY_HOTFIX: .MajorMinorPatch,.PreReleaseLabelWithDash
-  GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
+  # GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .SemVer
+  # GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
+  # GITVERSION_TAG_PROPERTY_DEVELOP: .MajorMinorPatch,.PreReleaseLabelWithDash
+  # GITVERSION_TAG_PROPERTY_RELEASE: .MajorMinorPatch,.PreReleaseLabelWithDash
+  # GITVERSION_TAG_PROPERTY_HOTFIX: .MajorMinorPatch,.PreReleaseLabelWithDash
+  # GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
 
 jobs:
   gitversion:
@@ -50,7 +50,7 @@ jobs:
           DIFF_SOURCE="${GITHUB_BASE_REF}"
         fi
         # use main as source if current branch is a release branch
-        if [ "$(echo "${DIFF_DEST}" | grep -o '^release/')" = "release/" ]; then
+        if [ "$(echo "${DIFF_DEST}" | grep -o '^main/')" = "main/" ]; then
           DIFF_SOURCE="main"
         fi
         # use main as source if current branch is a hotfix branch
@@ -109,7 +109,7 @@ jobs:
           "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER"
 
     - name: Tag build
-      if: ${{ github.event_name == 'push' && (startsWith(steps.calculate_changed_services.outputs.diff_dest, 'release') || startsWith(steps.calculate_changed_services.outputs.diff_dest, 'hotfix') || contains(env.MAIN_BRANCHES, steps.calculate_changed_services.outputs.diff_dest)) }}
+      if: ${{ github.event_name == 'push' && (startsWith(steps.calculate_changed_services.outputs.diff_dest, 'main') || startsWith(steps.calculate_changed_services.outputs.diff_dest, 'hotfix') || contains(env.MAIN_BRANCHES, steps.calculate_changed_services.outputs.diff_dest)) }}
       run: |
         # https://github.com/orgs/community/discussions/26560
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
