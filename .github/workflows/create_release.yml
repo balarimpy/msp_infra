@@ -1,15 +1,10 @@
-# Your workflow file
 name: Semantic Release
 
 on:
   push:
-    branches:
-      - main
-      - develop/*
-      
     tags:
       - 'v*'       # Trigger on tags starting with "v"
-      - 'bm*'      # Trigger on tags starting with "bm"  
+      - 'bm*'      # Trigger on tags starting with "bm"
 
 jobs:
   semantic-release:
@@ -67,4 +62,8 @@ jobs:
           if [[ "${{ steps.set_release_published.outputs.release_published }}" == 'true' ]]; then
             git add CHANGELOG.md
             git commit -m "chore(release): update changelog"
+            git tag -a v${{ steps.semantic.outputs.new_release_version }} -m "Release v${{ steps.semantic.outputs.new_release_version }}"
+            git tag -a bm${{ steps.semantic.outputs.new_release_version }} -m "Release bm${{ steps.semantic.outputs.new_release_version }}"
+            git push origin v${{ steps.semantic.outputs.new_release_version }}
+            git push origin bm${{ steps.semantic.outputs.new_release_version }}
           fi
