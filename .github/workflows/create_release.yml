@@ -51,7 +51,9 @@ jobs:
           echo ${{ steps.semantic.outputs.new_release_major_version }}
           echo ${{ steps.semantic.outputs.new_release_minor_version }}
           echo ${{ steps.semantic.outputs.new_release_patch_version }}
-
+          
       - name: Commit Changelog
         run: git add CHANGELOG.md && git commit -m "chore(release): update changelog"
         if: steps.semantic.outputs.new_release_published == 'true'
+
+
