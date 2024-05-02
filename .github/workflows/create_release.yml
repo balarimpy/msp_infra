@@ -29,8 +29,8 @@ jobs:
         run: mv .releaserc.prerelease.yaml .releaserc.yaml
 
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v2
         id: semantic
+        uses: cycjimmy/semantic-release-action@v2
         with:
           semantic_version: 17
           extra_plugins: |
@@ -39,6 +39,11 @@ jobs:
             @semantic-release/git@9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Debug Semantic Version
+        run: |
+          echo "Semantic Version: ${{ steps.semantic.outputs.new_release_version }}"
+          echo "Commit Message: ${{ github.event.head_commit.message }}"
 
       - name: Set release published flag
         id: set_release_published
