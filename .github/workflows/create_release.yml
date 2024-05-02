@@ -1,3 +1,4 @@
+# Your workflow file
 name: Semantic Release
 
 on:
@@ -5,9 +6,7 @@ on:
     branches:
       - main
       - develop/*
-    tags:
-      - 'v*'       # Trigger on tags starting with "v"
-      - 'bm*'      # Trigger on tags starting with "bm"
+    
 
 jobs:
   semantic-release:
