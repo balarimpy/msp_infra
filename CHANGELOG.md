@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Fixed a bug
 
-## [1.1.4] - 2024-05-02
+## [1.1.5] - 2024-05-02
 
 ### Added
 - Initial release
