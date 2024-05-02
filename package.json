@@ -1,16 +1,16 @@
 {
-    // "name": "msp_infra",
-    // "version": "1.0.0",
-    // "description": "This repository accompanies my Youtube Series on how to create and release actions.",
-    // // "main": "index.js",
-    // // "scripts": {
-    // //   "build": "node esbuild.cjs",
-    // //   "test": "echo \"Error: no test specified\" && exit 1"
-    // // },
-    // "repository": {
-    //   "type": "git",
-    //   "url": "git+https://github.com/balarimpy/msp_infra.git"
-    // },
+    "name": "msp_infra",
+    "version": "1.0.0",
+    "description": "This repository accompanies my Youtube Series on how to create and release actions.",
+    "main": "index.js",
+    "scripts": {
+      "build": "node esbuild.cjs",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/balarimpy/msp_infra.git"
+    },
     "keywords": [],
     "author": "",
     "license": "MIT",
