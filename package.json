@@ -1,5 +1,5 @@
 {
-    "name": "daves-youtube-demo-action",
+    "name": "msp_infra",
     "version": "1.0.0",
     "description": "This repository accompanies my Youtube Series on how to create and release actions.",
     "main": "index.js",
