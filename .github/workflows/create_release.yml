@@ -6,8 +6,10 @@ on:
     branches:
       - main
       - develop/*
-      - feature/*
-      - hotfix/*
+      
+    tags:
+      - 'v*'       # Trigger on tags starting with "v"
+      - 'bm*'      # Trigger on tags starting with "bm"  
 
 jobs:
   semantic-release:
