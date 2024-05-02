@@ -1,3 +1,4 @@
+# Your workflow file
 name: Semantic Release
 
 on:
@@ -11,12 +12,10 @@ on:
 jobs:
   semantic-release:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
-
     name: Semantic Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,7 +33,7 @@ jobs:
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
-        id: semantic # Need an `id` for output variables
+        id: semantic
         with:
           semantic_version: 17
           extra_plugins: |
@@ -44,16 +43,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set release published flag
+        id: set_release_published
+        run: echo "::set-output name=release_published::${{ steps.semantic.outputs.new_release_published }}"
+
       - name: Do something when a new release published
-        if: steps.semantic.outputs.new_release_published == 'true'
+        if: steps.set_release_published.outputs.release_published == 'true'
         run: |
           echo ${{ steps.semantic.outputs.new_release_version }}
           echo ${{ steps.semantic.outputs.new_release_major_version }}
           echo ${{ steps.semantic.outputs.new_release_minor_version }}
           echo ${{ steps.semantic.outputs.new_release_patch_version }}
-          
+
       - name: Commit Changelog
-        run: git add CHANGELOG.md && git commit -m "chore(release): update changelog"
-        if: steps.semantic.outputs.new_release_published == 'true'
-
-
+        run: |
+          if [[ "${{ steps.set_release_published.outputs.release_published }}" == 'true' ]]; then
+            git add CHANGELOG.md
+            git commit -m "chore(release): update changelog"
+          fi
