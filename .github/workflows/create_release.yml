@@ -1,5 +1,4 @@
-# Your workflow file
-name: Semantic Release
+name: Semantic Release with Changelog
 
 on:
   push:
@@ -54,6 +53,11 @@ jobs:
           echo ${{ steps.semantic.outputs.new_release_major_version }}
           echo ${{ steps.semantic.outputs.new_release_minor_version }}
           echo ${{ steps.semantic.outputs.new_release_patch_version }}
+
+      - name: Generate Changelog
+        if: steps.set_release_published.outputs.release_published == 'true'
+        run: |
+          git log --oneline ${GITHUB_REF#refs/*/}...HEAD > CHANGELOG.md
 
       - name: Set up Git identity
         run: |
