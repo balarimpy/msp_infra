@@ -63,7 +63,8 @@ pipeline {
         stage('Build & Tag Docker Image') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'docker') {
+                
+                    withDockerRegistry(credentialsId: 'docker-hub-cred') {
                         sh "docker build -t msp_demo -f docker/Dockerfile ."
                         sh "docker tag  msp_demo rimpybala/msp_demo:latest"
                         
