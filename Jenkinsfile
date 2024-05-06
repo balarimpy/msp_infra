@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Sayantan2k24/java-maven-eks-Ekart.git'
+                git branch: 'main', url: 'https://github.com/balarimpy/msp_infra'
             }
         }
         
@@ -66,7 +66,7 @@ pipeline {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'docker') {
                         sh "docker build -t shopping-cart -f docker/Dockerfile ."
-                        sh "docker tag  shopping-cart sayantan2k21/shopping-cart:latest"
+                        sh "docker tag  shopping-cart rimpybala/shopping-cart:latest"
                         
                     }
                 }
@@ -75,7 +75,7 @@ pipeline {
         
         stage('Trivy Scan') {
             steps {
-                sh "trivy image sayantan2k21/shopping-cart:latest > trivy-report.txt "
+                sh "trivy image rimpybala/shopping-cart:latest > trivy-report.txt "
                 
             }
         }
@@ -84,7 +84,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'docker') {
-                        sh "docker push sayantan2k21/shopping-cart:latest"
+                        sh "docker push rimpybala/shopping-cart:latest"
                     }
                 }
                  
