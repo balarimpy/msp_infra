@@ -39,10 +39,10 @@ pipeline {
             }
             
         }
-        
+        dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DC'
         stage('OWASP DEpendency Check') {
             steps {
-                dependencyCheck additionalArguments: ' --scan ./', odcInstallation: 'DC'
+                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DC'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
@@ -91,15 +91,15 @@ pipeline {
             }
         }
         
-        stage('Kubernetes Deploy') {
-            steps {
-                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://172.31.15.138:6443') {
-                    sh "kubectl apply -f deploymentservice.yml -n webapps"
-                    sh "kubectl get svc -n webapps"
+        // stage('Kubernetes Deploy') {
+        //     steps {
+        //         withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://172.31.15.138:6443') {
+        //             sh "kubectl apply -f deploymentservice.yml -n webapps"
+        //             sh "kubectl get svc -n webapps"
     
-                }
-            }
-        }
+        //         }
+        //     }
+        // }
         
         
     }
