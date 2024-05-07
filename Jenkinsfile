@@ -90,7 +90,7 @@ pipeline {
                  
             }
         }
-        
+        //
         // stage('Kubernetes Deploy') {
         //     steps {
         //         withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://172.31.20.196:6443') {
