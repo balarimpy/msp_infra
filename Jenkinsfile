@@ -90,16 +90,16 @@ pipeline {
                  
             }
         }
-        //
-        // stage('Kubernetes Deploy') {
-        //     steps {
-        //         withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://172.31.20.196:6443') {
-        //             sh "kubectl apply -f deploymentservice.yml -n webapps"
-        //             sh "kubectl get svc -n webapps"
+        
+        stage('Kubernetes Deploy') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://192.168.122.144:6443') {
+                    sh "kubectl apply -f deploymentservice.yml -n webapps"
+                    sh "kubectl get svc -n webapps"
     
-        //         }
-        //     }
-        // }   
+                }
+            }
+        }   
         
     }
 }
