@@ -64,7 +64,7 @@ pipeline {
             steps {
                 script {
                     // Ensure Buildx is initialized
-                    sh 'docker buildx create --use || echo "Buildx builder already exists"'
+                    sh 'docker buildx create --name mybuilder --use || echo "Buildx builder already exists"'
                 }
             }
         }
@@ -76,15 +76,16 @@ pipeline {
                         $class: 'AmazonWebServicesCredentialsBinding',
                         credentialsId: 'aws-ecr'
                     ]]) {
-                        // AWS CLI login to ECR is no longer needed as the credential helper is used
+                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 416668258315.dkr.ecr.us-east-1.amazonaws.com"
                         
                         // Build and tag the Docker image
-                        sh "docker build -t msp-repo ."
+                        sh "docker buildx build --builder mybuilder --tag msp-repo ."
                         sh "docker tag msp-repo:latest 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
                     }
                 }
             }
         }
+        
 
         
         stage('Trivy Scan') {
