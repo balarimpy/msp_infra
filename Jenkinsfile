@@ -60,20 +60,25 @@ pipeline {
             }
         }
         
+        
         stage('Build & Tag Docker Image') {
             steps {
                 script {
-                
-                    withDockerRegistry(credentialsId: 'aws-ecr') {
-                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 416668258315.dkr.ecr.us-east-1.amazonaws.com"
+                    withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-ecr'
+                    ]]) {
+                        // Login to AWS ECR
+                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo"
+
+                        // Build and tag the Docker image
                         sh "docker build -t msp-repo ."
                         sh "docker tag msp-repo:latest 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
-                      //  sh "docker tag  msp_demo rimpybala/msp_demo:latest"
-                        
                     }
                 }
             }
         }
+
         
         stage('Trivy Scan') {
             steps {
@@ -85,13 +90,14 @@ pipeline {
         stage('Push The Docker Image') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'docker') {
+                    withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-ecr'
+                    ]]) {
+                        // Push the Docker image to AWS ECR
                         sh "docker push 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
-                       // sh "docker push rimpybala/msp_demo:latest"
                     }
                 }
-                 
-            }
         }
         
         // stage('Kubernetes Deploy') {
