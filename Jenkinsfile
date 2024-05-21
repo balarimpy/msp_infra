@@ -8,6 +8,7 @@ pipeline {
     
     environment {
         SCANNER_HOME= tool 'sonar-scanner'
+        DOCKER_BUILDKIT = '1'  // Enable Docker BuildKit
     }
 
     stages {
@@ -66,18 +67,16 @@ pipeline {
                 script {
                     withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'aws-ecr'
+                        credentialsId: 'aws-ecr-credentials-id'
                     ]]) {
-                        // Login to AWS ECR
-                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo"
-
+                        // AWS CLI login to ECR is no longer needed as the credential helper is used
+                        
                         // Build and tag the Docker image
                         sh "docker build -t msp-repo ."
                         sh "docker tag msp-repo:latest 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
                     }
                 }
             }
-        }
 
         
         stage('Trivy Scan') {
