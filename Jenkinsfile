@@ -60,7 +60,14 @@ pipeline {
                 }
             }
         }
-        
+        stage('Setup Docker Buildx') {
+            steps {
+                script {
+                    // Ensure Buildx is initialized
+                    sh 'docker buildx create --use || echo "Buildx builder already exists"'
+                }
+            }
+        }
         
         stage('Build & Tag Docker Image') {
             steps {
