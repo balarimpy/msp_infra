@@ -67,7 +67,7 @@ pipeline {
                 script {
                     withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'aws-ecr-credentials-id'
+                        credentialsId: 'aws-ecr'
                     ]]) {
                         // AWS CLI login to ECR is no longer needed as the credential helper is used
                         
