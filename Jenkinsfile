@@ -64,9 +64,11 @@ pipeline {
             steps {
                 script {
                 
-                    withDockerRegistry(credentialsId: 'docker-hub-cred') {
-                        sh "docker build -t msp_demo -f docker/Dockerfile ."
-                        sh "docker tag  msp_demo rimpybala/msp_demo:latest"
+                    withDockerRegistry(credentialsId: 'aws-ecr') {
+                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 416668258315.dkr.ecr.us-east-1.amazonaws.com"
+                        sh "docker build -t msp-repo ."
+                        sh "docker tag msp-repo:latest 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
+                      //  sh "docker tag  msp_demo rimpybala/msp_demo:latest"
                         
                     }
                 }
@@ -75,7 +77,7 @@ pipeline {
         
         stage('Trivy Scan') {
             steps {
-                sh "trivy image rimpybala/msp_demo:latest > trivy-report.txt "
+                sh "trivy image 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest > trivy-report.txt "
                 
             }
         }
@@ -84,22 +86,23 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'docker') {
-                        sh "docker push rimpybala/msp_demo:latest"
+                        sh "docker push 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
+                       // sh "docker push rimpybala/msp_demo:latest"
                     }
                 }
                  
             }
         }
         
-        stage('Kubernetes Deploy') {
-            steps {
-                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://192.168.122.144:6443') {
-                    sh "kubectl apply -f deploymentservice.yml -n webapps"
-                    sh "kubectl get svc -n webapps"
+        // stage('Kubernetes Deploy') {
+        //     steps {
+        //         withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://192.168.122.144:6443') {
+        //             sh "kubectl apply -f deploymentservice.yml -n webapps"
+        //             sh "kubectl get svc -n webapps"
     
-                }
-            }
-        }   
+        //         }
+        //     }
+        // }   
         
     }
 }
