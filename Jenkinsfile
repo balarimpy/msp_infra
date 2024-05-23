@@ -90,7 +90,7 @@ pipeline {
                 script {
                     // Build and tag the Docker image using Buildx
                     sh """
-                    docker buildx build --platform linux/amd64 -t msp-repo:latest --load .
+                    docker buildx build --platform linux/amd64 -t msp-repo:latest --push .
                     """
                 }
             }
