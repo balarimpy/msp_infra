@@ -90,8 +90,7 @@ pipeline {
                 script {
                     // Build and tag the Docker image using Buildx
                     sh """
-                    docker buildx build --platform linux/amd64 -t msp-repo .
-                    docker tag msp-repo:latest 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest
+                    docker buildx build --platform linux/amd64 -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} --push .
                     """
                 }
             }
