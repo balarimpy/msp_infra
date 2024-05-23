@@ -82,12 +82,7 @@ pipeline {
         }
 
         
-        // stage('Trivy Scan') {
-        //     steps {
-        //         sh "trivy image ${AWS_ACCOUNT_ID}.${REPOSITORY_URI}/msp-repo:latest > trivy-report.txt "
-                
-        //     }
-        // }
+
         
         stage('Pushing to ECR') {
             steps{  
@@ -97,7 +92,13 @@ pipeline {
             }
             }
       }
-        
+        stage('Trivy Scan') {
+            steps {
+                sh "trivy image ${AWS_ACCOUNT_ID}.${REPOSITORY_URI}/msp-repo:latest > trivy-report.txt "
+                
+            }
+        }  
+
         // stage('Kubernetes Deploy') {
         //     steps {
         //         withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://192.168.122.144:6443') {
