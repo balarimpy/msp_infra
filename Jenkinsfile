@@ -62,6 +62,29 @@ pipeline {
                 }
             }
         }
+        
+        
+        stage('Setup Buildx') {
+            steps {
+                script {
+                    sh '''
+                    # Ensure the directory exists
+                    mkdir -p ~/.docker/cli-plugins
+
+                    # Fetch the latest release URL for docker-buildx-linux-amd64
+                    BUILDX_URL=$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | grep browser_download_url | grep linux-amd64 | cut -d '"' -f 4)
+                    
+                    # Download and setup Buildx
+                    wget $BUILDX_URL -O ~/.docker/cli-plugins/docker-buildx
+                    chmod +x ~/.docker/cli-plugins/docker-buildx
+
+                    # Create and use a new builder instance
+                    docker buildx create --name mybuilder --use
+                    docker buildx inspect mybuilder --bootstrap
+                    '''
+                }
+            }
+        }
         stage('Building image and Tagging') {
             steps {
                 script {
