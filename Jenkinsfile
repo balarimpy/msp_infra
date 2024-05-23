@@ -62,20 +62,6 @@ pipeline {
                 }
             }
         }
-        stage('Setup Buildx') {
-            steps {
-                script {
-                    // Download and setup Buildx
-                    sh '''
-                    mkdir -p ~/.docker/cli-plugins
-                    wget https://github.com/docker/buildx/releases/latest/download/docker-buildx-linux-amd64 -O ~/.docker/cli-plugins/docker-buildx
-                    chmod +x ~/.docker/cli-plugins/docker-buildx
-                    docker buildx create --use
-                    '''
-                }
-            }
-        }
-
         stage('Building image and Tagging') {
             steps {
                 script {
