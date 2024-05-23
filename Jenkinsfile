@@ -62,16 +62,31 @@ pipeline {
                 }
             }
         }
-        
-        stage('Building image and Tagging') {
+        stage('Setup Buildx') {
             steps {
                 script {
-                    sh """ docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} ."""
-                    sh """docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:$IMAGE_TAG"""
+                    // Download and setup Buildx
+                    sh '''
+                    mkdir -p ~/.docker/cli-plugins
+                    wget https://github.com/docker/buildx/releases/latest/download/docker-buildx-linux-amd64 -O ~/.docker/cli-plugins/docker-buildx
+                    chmod +x ~/.docker/cli-plugins/docker-buildx
+                    docker buildx create --use
+                    '''
                 }
             }
         }
-   
+
+        stage('Building image and Tagging') {
+            steps {
+                script {
+                    // Build and tag the Docker image using Buildx
+                    sh """
+                    docker buildx build --platform linux/amd64 -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} .
+                    docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:${IMAGE_TAG}
+                    """
+                }
+            }
+        }
 
         
         stage('Trivy Scan') {
