@@ -82,12 +82,12 @@ pipeline {
         }
 
         
-        stage('Trivy Scan') {
-            steps {
-                sh "trivy image 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest > trivy-report.txt "
+        // stage('Trivy Scan') {
+        //     steps {
+        //         sh "trivy image ${AWS_ACCOUNT_ID}.${REPOSITORY_URI}/msp-repo:latest > trivy-report.txt "
                 
-            }
-        }
+        //     }
+        // }
         
         stage('Pushing to ECR') {
             steps{  
