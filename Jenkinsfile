@@ -83,7 +83,7 @@ pipeline {
         }
         stage('Trivy Scan') {
             steps {
-                sh "trivy image ${AWS_ACCOUNT_ID}.${REPOSITORY_URI}:$IMAGE_TAG > trivy-report.txt "
+                sh "trivy image ${REPOSITORY_URI}:$IMAGE_TAG > trivy-report.txt "
                 
             }
         }       
