@@ -8,7 +8,9 @@ pipeline {
     
     environment {
         SCANNER_HOME= tool 'sonar-scanner'
-        DOCKER_BUILDKIT = '1'  // Enable Docker BuildKit
+        IMAGE_REPO_NAME = "msp-repo"
+        IMAGE_TAG = "latest"
+        REPOSITORY_URI = "416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo"
     }
 
     stages {
@@ -60,32 +62,16 @@ pipeline {
                 }
             }
         }
-        stage('Setup Docker Buildx') {
+        
+        stage('Building image and Tagging') {
             steps {
                 script {
-                    // Ensure Buildx is initialized
-                    sh 'docker buildx create --use || echo "Buildx builder already exists"'
+                    sh """ docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} ."""
+                    sh """docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:$IMAGE_TAG"""
                 }
             }
         }
-        
-        stage('Build & Tag Docker Image') {
-            steps {
-                script {
-                    withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'aws-ecr'
-                    ]]) {
-                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 416668258315.dkr.ecr.us-east-1.amazonaws.com"
-                        
-                        // Build and tag the Docker image
-                        sh "docker buildx build --tag msp-repo ."
-                        sh "docker tag msp-repo:latest 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
-                    }
-                }
-            }
-        }
-        
+   
 
         
         stage('Trivy Scan') {
@@ -103,7 +89,9 @@ pipeline {
                         credentialsId: 'aws-ecr'
                     ]]) {
                         // Push the Docker image to AWS ECR
-                        sh "docker push 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
+                        sh """docker push 416668258315.dkr.ecr.us-east-1.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}"""
+
+                       // sh "docker push 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
                     }
                 }
         }
