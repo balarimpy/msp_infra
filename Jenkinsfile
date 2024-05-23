@@ -77,13 +77,16 @@ pipeline {
         steps{
             script {
             dockerImage = docker.build "${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+            sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:$IMAGE_TAG"
             }
         }
         }
-
-        
-
-        
+        stage('Trivy Scan') {
+            steps {
+                sh "trivy image ${AWS_ACCOUNT_ID}.${REPOSITORY_URI}:$IMAGE_TAG > trivy-report.txt "
+                
+            }
+        }       
         stage('Pushing to ECR') {
             steps{  
             script {
@@ -92,12 +95,7 @@ pipeline {
             }
             }
       }
-        stage('Trivy Scan') {
-            steps {
-                sh "trivy image ${AWS_ACCOUNT_ID}.${REPOSITORY_URI}/msp-repo:latest > trivy-report.txt "
-                
-            }
-        }  
+
 
         // stage('Kubernetes Deploy') {
         //     steps {
