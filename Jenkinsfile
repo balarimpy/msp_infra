@@ -90,8 +90,8 @@ pipeline {
                 script {
                     // Build and tag the Docker image using Buildx
                     sh """
-                    docker buildx build --platform linux/amd64 -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} .
-                    docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:${IMAGE_TAG}
+                    docker buildx build --platform linux/amd64 -t msp-repo .
+                    docker tag msp-repo:latest 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest
                     """
                 }
             }
@@ -113,7 +113,7 @@ pipeline {
                         credentialsId: 'aws-ecr'
                     ]]) {
                         // Push the Docker image to AWS ECR
-                        sh """docker push 416668258315.dkr.ecr.us-east-1.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}"""
+                        sh "docker push 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
 
                        // sh "docker push 416668258315.dkr.ecr.us-east-1.amazonaws.com/msp-repo:latest"
                     }
